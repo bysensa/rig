@@ -26,7 +26,7 @@ impl Client {
         Self::from_url(api_key, TOGETHER_AI_BASE_URL)
     }
 
-    fn from_url(api_key: &str, base_url: &str) -> Self {
+    pub fn from_url(api_key: &str, base_url: &str) -> Self {
         Self {
             base_url: base_url.to_string(),
             http_client: reqwest::Client::builder()
