@@ -48,7 +48,7 @@ impl Client {
     pub fn from_url_and_client(api_key: &str, base_url: &str, client: reqwest::Client) -> Self {
         Self {
             base_url: base_url.to_string(),
-            api_key: String,
+            api_key: api_key.to_string(),
             http_client: client,
         }
     }
