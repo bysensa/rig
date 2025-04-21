@@ -65,7 +65,7 @@ impl<'a> ClientBuilder<'a> {
         self
     }
 
-    pub fn client(mut self, client: reqwest::ClientBuilder<'a>) -> Self {
+    pub fn client(mut self, client: reqwest::ClientBuilder) -> Self {
         self.client = Some(Arc::new(client));
         self
     }
