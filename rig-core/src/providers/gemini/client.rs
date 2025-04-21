@@ -45,6 +45,14 @@ impl Client {
         }
     }
 
+    pub fn from_url_and_client(api_key: &str, base_url: &str, client: reqwest::Client) -> Self {
+        Self {
+            base_url: base_url.to_string(),
+            api_key: String,
+            http_client: client,
+        }
+    }
+
     /// Create a new Google Gemini client from the `GEMINI_API_KEY` environment variable.
     /// Panics if the environment variable is not set.
     pub fn from_env() -> Self {
