@@ -18,6 +18,7 @@ pub struct ClientBuilder<'a> {
     base_url: &'a str,
     anthropic_version: &'a str,
     anthropic_betas: Option<Vec<&'a str>>,
+    client: Option<ClientBuilder>,
 }
 
 /// Create a new anthropic client using the builder
@@ -39,6 +40,7 @@ impl<'a> ClientBuilder<'a> {
             base_url: ANTHROPIC_API_BASE_URL,
             anthropic_version: ANTHROPIC_VERSION_LATEST,
             anthropic_betas: None,
+            client: None,
         }
     }
 
@@ -62,12 +64,18 @@ impl<'a> ClientBuilder<'a> {
         self
     }
 
+    pub fn client(mut self, client: reqwest::ClientBuilder) -> Self {
+        self.client = Some(client);
+        self
+    }
+
     pub fn build(self) -> Client {
         Client::new(
             self.api_key,
             self.base_url,
             self.anthropic_betas,
             self.anthropic_version,
+            self.client,
         )
     }
 }
@@ -86,10 +94,10 @@ impl Client {
     /// - If the API key or version cannot be parsed as a Json value from a String.
     ///   - This should really never happen.
     /// - If the reqwest client cannot be built (if the TLS backend cannot be initialized).
-    pub fn new(api_key: &str, base_url: &str, betas: Option<Vec<&str>>, version: &str) -> Self {
+    pub fn new(api_key: &str, base_url: &str, betas: Option<Vec<&str>>, version: &str, client: Option<reqwest::ClientBuilder>) -> Self {
         Self {
             base_url: base_url.to_string(),
-            http_client: reqwest::Client::builder()
+            http_client: client.unwrap_or(reqwest::Client::builder())
                 .default_headers({
                     let mut headers = reqwest::header::HeaderMap::new();
                     headers.insert("x-api-key", api_key.parse().expect("API key should parse"));
