@@ -49,6 +49,15 @@ impl Client {
         }
     }
 
+    pub fn from_url_and_client(api_key: &str, base_url: &str, client: reqwest::Client) -> Self {
+        Self {
+            base_url: base_url.to_string(),
+            http_client: client,
+        }
+    }
+
+    
+
     /// Create a new Together AI client from the `TOGETHER_API_KEY` environment variable.
     /// Panics if the environment variable is not set.
     pub fn from_env() -> Self {
