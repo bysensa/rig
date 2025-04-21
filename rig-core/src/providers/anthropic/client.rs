@@ -4,6 +4,7 @@ use crate::{agent::AgentBuilder, extractor::ExtractorBuilder};
 
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
+use std::sync::Arc;
 
 use super::completion::{CompletionModel, ANTHROPIC_VERSION_LATEST};
 
@@ -18,7 +19,7 @@ pub struct ClientBuilder<'a> {
     base_url: &'a str,
     anthropic_version: &'a str,
     anthropic_betas: Option<Vec<&'a str>>,
-    client: Option<ClientBuilder>,
+    client: Option<Arc<reqwest::ClientBuilder>>,
 }
 
 /// Create a new anthropic client using the builder
@@ -64,8 +65,8 @@ impl<'a> ClientBuilder<'a> {
         self
     }
 
-    pub fn client(mut self, client: reqwest::ClientBuilder) -> Self {
-        self.client = Some(client);
+    pub fn client(mut self, client: reqwest::ClientBuilder<'a>) -> Self {
+        self.client = Some(Arc::new(client));
         self
     }
 
@@ -75,7 +76,13 @@ impl<'a> ClientBuilder<'a> {
             self.base_url,
             self.anthropic_betas,
             self.anthropic_version,
-            self.client,
+            self.client.and_then(|inner| if Arc::strong_count(&inner) == 1 {
+                // This is unsafe and should be used with caution
+                let value = Arc::try_unwrap(inner).ok().unwrap();
+                Some(value)
+            } else {
+                None
+            }),
         )
     }
 }
