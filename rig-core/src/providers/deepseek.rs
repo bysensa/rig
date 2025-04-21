@@ -66,6 +66,15 @@ impl Client {
         }
     }
 
+    // Handy for advanced usage, e.g. letting user override base_url or set timeouts:
+    pub fn from_url_and_client(api_key: &str, base_url: &str, client: reqwest::Client) -> Self {
+        // Possibly configure a custom HTTP client here if needed.
+        Self {
+            base_url: base_url.to_string(),
+            http_client: client,
+        }
+    }
+
     fn post(&self, path: &str) -> reqwest::RequestBuilder {
         let url = format!("{}/{}", self.base_url, path).replace("//", "/");
         self.http_client.post(url)
